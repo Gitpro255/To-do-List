@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fun Activities</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation bar -->
+  <nav>
+    <a href="index.html">🏠 Planner</a>
+    <a href="activities.html">🎯 Activities</a>
+    <a href="notes.html">📝 Notes</a>
+    <button id="themeToggle">🌙 Toggle Theme</button>
+  </nav>
+
+  <!-- Header -->
+  <header>
+    <h1>🌟 Fun & Creative Activities</h1>
+    <p>Take a break, recharge, and enjoy!</p>
+  </header>
+
+  <!-- Relaxation Timer -->
+  <section>
+    <h2>🎵 Relaxation Timer</h2>
+    <div class="activity">
+      <p>Set a quick relaxation timer to pause and breathe.</p>
+      <button onclick="startTimer()">Start 1-Minute Relaxation</button>
+      <p id="timerDisplay"></p>
+    </div>
+  </section>
+
+  <!-- Habit Tracker -->
+  <section>
+    <h2>📝 Habit Tracker</h2>
+    <div class="activity">
+      <input type="text" id="habitInput" placeholder="Enter a habit...">
+      <button onclick="addHabit()">➕ Add Habit</button>
+      <button onclick="clearHabits()">🗑️ Clear All Habits</button>
+      <ul id="habitList"></ul>
+    </div>
+  </section>
+
+  <!-- Mini Game -->
+  <section>
+    <h2>🎮 Mini Game: Lucky Number</h2>
+    <div class="activity">
+      <p>Guess a number between 1 and 5!</p>
+      <input type="number" id="guessInput" min="1" max="5">
+      <button onclick="playGame()">Play</button>
+      <p id="gameResult"></p>
+    </div>
+  </section>
+
+  <!-- Navigation -->
+  <a class="next" href="notes.html">➡️ Next Page: Notes & Plans</a>
+
+  <!-- Combined Script -->
+  <script>
+    // Relaxation Timer
+    function startTimer() {
+      let time = 60;
+      const display = document.getElementById("timerDisplay");
+      display.textContent = "Relax... 60 seconds left";
+      const interval = setInterval(() => {
+        time--;
+        display.textContent = `Relax... ${time} seconds left`;
+        if (time <= 0) {
+          clearInterval(interval);
+          display.textContent = "✅ Time's up! Feeling refreshed?";
+        }
+      }, 1000);
+    }
+
+    // Habit Tracker
+    function addHabit() {
+      const habitInput = document.getElementById("habitInput");
+      const habitList = document.getElementById("habitList");
+      const habitText = habitInput.value.trim();
+      if (habitText === "") return;
+      const li = document.createElement("li");
+      li.textContent = habitText;
+      habitList.appendChild(li);
+      saveHabits();
+      habitInput.value = "";
+    }
+
+    function saveHabits() {
+      const habits = [];
+      document.querySelectorAll("#habitList li").forEach(li => {
+        habits.push(li.textContent);
+      });
+      localStorage.setItem("habits", JSON.stringify(habits));
+    }
+
+    function clearHabits() {
+      document.getElementById("habitList").innerHTML = "";
+      localStorage.removeItem("habits");
+    }
+
+    // Load habits on page load
+    window.onload = () => {
+      const savedHabits = JSON.parse(localStorage.getItem("habits")) || [];
+      savedHabits.forEach(habit => {
+        const li = document.createElement("li");
+        li.textContent = habit;
+        document.getElementById("habitList").appendChild(li);
+      });
+
+      // Apply saved theme
+      const currentTheme = localStorage.getItem("theme");
+      let index = themes.findIndex(t => t.name === currentTheme);
+      if (index === -1) index = 0;
+      document.body.classList.add(themes[index].name);
+      themeToggle.textContent = `${themes[index].icon} Toggle Theme`;
+      themeIndex = index;
+    };
+
+    // Mini Game
+    function playGame() {
+      const guess = parseInt(document.getElementById("guessInput").value);
+      const result = document.getElementById("gameResult");
+      const luckyNumber = Math.floor(Math.random() * 5) + 1;
+      if (guess === luckyNumber) {
+        result.textContent = "🎉 Correct! Lucky number was " + luckyNumber;
+      } else {
+        result.textContent = "❌ Wrong! Lucky number was " + luckyNumber;
+      }
+    }
+
+    // Theme toggle with icons
+    const themeToggle = document.getElementById("themeToggle");
+    const themes = [
+      { name: "dark-mode", icon: "🌙" },
+      { name: "light-mode", icon: "☀️" },
+      { name: "blue-mode", icon: "🔵" },
+      { name: "green-mode", icon: "🌿" },
+      { name: "purple-mode", icon: "💜" }
+    ];
+    let themeIndex = 0;
+
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.remove(themes[themeIndex].name);
+      themeIndex = (themeIndex + 1) % themes.length;
+      document.body.classList.add(themes[themeIndex].name);
+      themeToggle.textContent = `${themes[themeIndex].icon} Toggle Theme`;
+      localStorage.setItem("theme", themes[themeIndex].name);
+    });
+  </script>
+</body>
+</html>
